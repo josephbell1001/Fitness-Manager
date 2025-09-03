@@ -1,0 +1,12 @@
+{
+    "exercises": [
+      { "name": "Deadlift", "targetMuscle": "Back", "weight": 405, "reps": 5 },
+      { "name": "Overhead Press", "targetMuscle": "Shoulders", "weight": 135, "reps": 8 },
+      { "name": "Bicep Curl", "targetMuscle": "Arms", "weight": 40, "reps": 12 }
+    ],
+    "sessions": [
+      { "name": "Strength Day", "exerciseSets": [] },
+      { "name": "Hypertrophy Day", "exerciseSets": [] }
+    ]
+  }
+  

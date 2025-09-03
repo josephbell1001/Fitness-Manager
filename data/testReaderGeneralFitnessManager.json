@@ -1,0 +1,31 @@
+{
+    "exercises": [
+      {
+        "name": "Incline Bench",
+        "targetMuscle": "Chest",
+        "weight": 100,
+        "reps": 16
+      },
+      {
+        "name": "Squat",
+        "targetMuscle": "Legs",
+        "weight": 315,
+        "reps": 6
+      }
+    ],
+    "sessions": [
+      {
+        "name": "Leg Day",
+        "exerciseSets": [
+          {
+            "name": "Squat",
+            "targetMuscle": "Legs",
+            "weight": 315,
+            "reps": 6,
+            "sets": 3
+          }
+        ]
+      }
+    ]
+  }
+  

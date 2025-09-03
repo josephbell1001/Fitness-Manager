@@ -1,0 +1,9 @@
+{
+    "sessions": [],
+    "exercises": [{
+        "reps": 15,
+        "name": "Pull-Up",
+        "weight": 0,
+        "targetMuscle": "Back"
+    }]
+}

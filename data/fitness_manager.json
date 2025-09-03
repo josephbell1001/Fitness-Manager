@@ -1,0 +1,94 @@
+{
+    "sessions": [
+        {
+            "name": "Arms",
+            "exerciseSets": [
+                {
+                    "reps": 8,
+                    "sets": 2,
+                    "name": "Curls",
+                    "weight": 40,
+                    "targetMuscle": "Biceps"
+                },
+                {
+                    "reps": 16,
+                    "sets": 2,
+                    "name": "Tricep Overhead Press",
+                    "weight": 120,
+                    "targetMuscle": "Triceps"
+                },
+                {
+                    "reps": 8,
+                    "sets": 2,
+                    "name": "Tricep Extensions",
+                    "weight": 65,
+                    "targetMuscle": "Triceps"
+                }
+            ]
+        },
+        {
+            "name": "Legs",
+            "exerciseSets": []
+        },
+        {
+            "name": "Push",
+            "exerciseSets": [{
+                "reps": 16,
+                "sets": 2,
+                "name": "Peck Deck",
+                "weight": 240,
+                "targetMuscle": "Chest"
+            }]
+        }
+    ],
+    "exercises": [
+        {
+            "reps": 12,
+            "name": "Lat Pulldown",
+            "weight": 200,
+            "targetMuscle": "Back"
+        },
+        {
+            "reps": 8,
+            "name": "Tricep Extensions",
+            "weight": 65,
+            "targetMuscle": "Triceps"
+        },
+        {
+            "reps": 5,
+            "name": "Bench Press",
+            "weight": 225,
+            "targetMuscle": "Chest"
+        },
+        {
+            "reps": 8,
+            "name": "Squats",
+            "weight": 225,
+            "targetMuscle": "Legs"
+        },
+        {
+            "reps": 8,
+            "name": "Curls",
+            "weight": 50,
+            "targetMuscle": "Biceps"
+        },
+        {
+            "reps": 16,
+            "name": "Tricep Overhead Press",
+            "weight": 120,
+            "targetMuscle": "Triceps"
+        },
+        {
+            "reps": 6,
+            "name": "Calf Raise",
+            "weight": 405,
+            "targetMuscle": "Calf"
+        },
+        {
+            "reps": 16,
+            "name": "Peck Deck",
+            "weight": 240,
+            "targetMuscle": "Chest"
+        }
+    ]
+}

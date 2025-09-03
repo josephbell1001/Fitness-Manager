@@ -1,0 +1,26 @@
+{
+    "sessions": [{
+        "name": "Leg Day",
+        "exerciseSets": [{
+            "reps": 8,
+            "sets": 4,
+            "name": "Squat",
+            "weight": 225,
+            "targetMuscle": "Legs"
+        }]
+    }],
+    "exercises": [
+        {
+            "reps": 10,
+            "name": "Bench Press",
+            "weight": 185,
+            "targetMuscle": "Chest"
+        },
+        {
+            "reps": 8,
+            "name": "Squat",
+            "weight": 225,
+            "targetMuscle": "Legs"
+        }
+    ]
+}
