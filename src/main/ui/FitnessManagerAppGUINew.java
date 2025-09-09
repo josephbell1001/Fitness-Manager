@@ -858,10 +858,36 @@ public class FitnessManagerAppGUINew extends JFrame {
             refreshAllUI();
         });
 
+        // Title + [Delete Exercise] to the left of the Edit Exercise button
+        JButton deleteBtn = ghostButton("\u274C  Delete Exercise");
+        deleteBtn.setBorder(new EmptyBorder(6, 12, 6, 12));
+        deleteBtn.addActionListener(a -> {
+            int r = JOptionPane.showConfirmDialog(
+                    this,
+                    "Delete exercise '" + e.getName() + "'?\n\nThis also removes it from every training session.",
+                    "Confirm Delete",
+                    JOptionPane.OK_CANCEL_OPTION,
+                    JOptionPane.WARNING_MESSAGE
+            );
+            if (r == JOptionPane.OK_OPTION) {
+                boolean ok = manager.deleteExercise(e.getName());
+                if (ok) {
+                    pushActivity("Deleted exercise: " + e.getName());
+                    refreshAllUI();
+                    toast("Exercise '" + e.getName() + "' deleted.");
+                    goHome();
+                } else {
+                    toastError("Could not delete exercise.");
+                }
+            }
+        });
+
+
         JPanel leftGroup = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
         leftGroup.setOpaque(false);
         leftGroup.add(exerciseDetailTitle);
         leftGroup.add(editBtn);
+        leftGroup.add(deleteBtn);
 
         exerciseDetailHeader.removeAll();
         exerciseDetailHeader.add(leftGroup, BorderLayout.WEST);

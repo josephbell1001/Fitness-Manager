@@ -121,4 +121,51 @@ public class FitnessManager implements Writable {
         return sessions;
     }
 
+    // MODIFIES: this
+// EFFECTS: deletes an exercise by name, removing it from the library AND all sessions.
+//          returns true if deleted; false if not found.
+public boolean deleteExercise(String name) {
+    Exercise e = findExerciseByName(name);
+    if (e == null) {
+        System.out.println("Error: exercise '" + name + "' not found!");
+        return false;
+    }
+
+    // remove from master list
+    boolean removedFromLibrary = exercises.remove(e);
+
+    // remove from all sessions (only if present to avoid misleading logs)
+    for (TrainingSession s : sessions) {
+        if (s.getExerciseSets().containsKey(e)) {
+            s.removeExercise(e); // TrainingSession logs its own event
+        }
+    }
+
+    if (removedFromLibrary) {
+        EventLog.getInstance().logEvent(new Event("Deleted exercise " + e.getName() + " from library and all sessions!"));
+    }
+    return removedFromLibrary;
+}
+
+    // MODIFIES: this
+    // EFFECTS: removes a specific exercise from a particular session.
+    //          returns true if the exercise existed in the session and was removed.
+    public boolean removeExerciseFromSession(String sessionName, String exerciseName) {
+        TrainingSession s = findSessionByName(sessionName);
+        Exercise e = findExerciseByName(exerciseName);
+        if (s == null || e == null) {
+            System.out.println("Error: session or exercise not found!");
+            return false;
+        }
+        if (!s.getExerciseSets().containsKey(e)) {
+            System.out.println("Info: exercise not present in session.");
+            return false;
+        }
+
+        s.removeExercise(e); // TrainingSession logs its own event
+        EventLog.getInstance().logEvent(new Event("Removed " + e.getName() + " from session " + s.getName() + "."));
+        return true;
+    }
+
+
 }
