@@ -33,6 +33,12 @@
             "name": "Bench Press",
             "weight": 225,
             "targetMuscle": "Chest"
+        },
+        {
+            "reps": 1,
+            "name": "Squat",
+            "weight": 405,
+            "targetMuscle": "Legs"
         }
     ]
 }
