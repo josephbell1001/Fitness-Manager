@@ -192,13 +192,9 @@ public class FitnessManagerAppGUINew extends JFrame {
         JButton saveBtn = ghostButton("\uD83D\uDCBE  Save Program");
         JButton loadBtn = ghostButton("\uD83D\uDCC2  Load Program");
 
-        // make them roomier/wider
+
         saveBtn.setBorder(new EmptyBorder(8, 16, 8, 16));
         loadBtn.setBorder(new EmptyBorder(8, 16, 8, 16));
-
-        // optional: same width
-        Dimension lw = loadBtn.getPreferredSize();
-        saveBtn.setPreferredSize(lw);
 
         saveBtn.addActionListener(e -> saveData());
         loadBtn.addActionListener(e -> {
@@ -206,18 +202,7 @@ public class FitnessManagerAppGUINew extends JFrame {
             refreshAllUI();
             pushActivity("Loaded program from disk.");
         });
-
-        // ensure Save is visibly blue & nicely padded
-        saveBtn.setBackground(new Color(28, 100, 242));
-        saveBtn.setForeground(Color.WHITE);
-        saveBtn.setBorder(new EmptyBorder(8, 16, 8, 16));
-
-        // make Load a bit bigger/wider
-        loadBtn.setBorder(new EmptyBorder(8, 16, 8, 16));
-        Dimension sd = saveBtn.getPreferredSize();
-        loadBtn.setPreferredSize(new Dimension((int)(sd.width * 1.10), sd.height)); // ~10% wider than Save
  
-
         right.add(saveBtn);
         right.add(Box.createHorizontalStrut(8));
         right.add(loadBtn);

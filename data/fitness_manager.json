@@ -30,6 +30,13 @@
                     "name": "Curls",
                     "weight": 50,
                     "targetMuscle": "Biceps"
+                },
+                {
+                    "reps": 4,
+                    "sets": 2,
+                    "name": "Overhead Press",
+                    "weight": 225,
+                    "targetMuscle": "Front Delts"
                 }
             ]
         },
