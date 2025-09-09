@@ -922,3 +922,7 @@ public class FitnessManagerAppGUINew extends JFrame {
         new FitnessManagerAppGUINew();
     }
 }
+
+// I KNOW YOU SEE THIS, TRY TO FIX THE GITHUB POSTING IT FROM MY OTHER ACCOUNT IDK WHY ITS DOING THAT THIS IS A TEST TO SEE THAT BUT ALSO IMPORTANT
+//fix menus
+//make it so that the buttons are centered, rn theyre off centered, all of them
