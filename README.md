@@ -128,7 +128,77 @@ java -cp "out;lib\json-20231013.jar" ui.FitnessManagerAppGUINew
 ```
 
 **Linux/macOS:**
+```
 find src -name "*.java" > sources.txt
 javac -cp "lib/json-20231013.jar:src" -d out @sources.txt
 java -cp "out:lib/json-20231013.jar" ui.FitnessManagerAppGUINew
+```
+
+---
+
+## 📂 Project Structure
+```
+src/
+  main/
+    model/
+      Exercise.java
+      TrainingSession.java
+      FitnessManager.java
+      Event.java
+      EventLog.java
+    persistence/
+      JsonReader.java
+      JsonWriter.java
+      Writable.java
+    ui/
+      FitnessManagerAppGUINew.java
+data/
+  fitness_manager.json   # created after first save
+```
+
+---
+
+## 🔧 Tips
+
+Compact UI → tweak COMPACT_ROW_HEIGHT or BTN_INSETS if buttons look too squished
+
+Quick Home → click the app title or bicep icons in the top bar
+
+Event Log → printed to console on quit
+
+---
+
+## 🛠️ Troubleshooting
+
+- Nothing saves → make sure data/ folder exists
+
+- Load fails → check JSON file isn’t corrupted
+
+- Squished buttons → increase COMPACT_ROW_HEIGHT
+
+- Delete doesn’t work → open exercise detail and delete from there
+
+---
+
+## 📌 Roadmap
+
+- Track individual sets (weights/reps per set)
+
+- Add rest timers
+
+- Search/filter in lists
+
+- Export sessions to CSV
+
+---
+
+## 📜 License
+
+- Personal project — feel free to learn from or fork. If you use this, a note of credit is appreciated.
+
+## 🙏 Credits
+
+- Java Swing for the UI
+
+- org.json library for JSON handling
 
