@@ -26,7 +26,6 @@ public class FitnessManagerAppGUINew extends JFrame {
     private FitnessManager manager = new FitnessManager();
 
 
-
     // ---------- UI: top / left / main ----------
     private JPanel topBar;
     private JPanel sideBar;
@@ -760,19 +759,19 @@ public class FitnessManagerAppGUINew extends JFrame {
         lbl.setBorder(new EmptyBorder(0, COMPACT_HPAD, 0, 0));
         row.add(lbl, BorderLayout.CENTER);
 
-        JButton edit = ghostButton("Edit");
-        edit.setFocusable(false);
-        fitCompact(edit);
-        edit.addActionListener(a -> {
-            openEditExerciseDialog(e);
-            // refresh rows after edit
-            refreshAllUI();
-        });
+        // JButton edit = ghostButton("Edit");
+        // edit.setFocusable(false);
+        // fitCompact(edit);
+        // edit.addActionListener(a -> {
+        //     openEditExerciseDialog(e);
+        //     // refresh rows after edit
+        //     refreshAllUI();
+        // });
 
         JPanel right = new JPanel(new FlowLayout(FlowLayout.RIGHT, 6, 3));
         right.setOpaque(false);
-        right.add(edit);
-        row.add(right, BorderLayout.EAST);
+        // right.add(edit);
+        // row.add(right, BorderLayout.EAST);
 
         row.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         row.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -803,14 +802,14 @@ public class FitnessManagerAppGUINew extends JFrame {
         lbl.setBorder(new EmptyBorder(0, COMPACT_HPAD, 0, 0));
         row.add(lbl, BorderLayout.CENTER);
 
-        JButton view = ghostButton("View");
-        view.setFocusable(false);
-        fitCompact(view);
-        view.addActionListener(a -> openSessionDetail(s)); // button still works
+        // JButton view = ghostButton("View");
+        // view.setFocusable(false);
+        // fitCompact(view);
+        // view.addActionListener(a -> openSessionDetail(s)); // button still works
 
         JPanel right = new JPanel(new FlowLayout(FlowLayout.RIGHT, 6, 3));
         right.setOpaque(false);
-        right.add(view);
+        // right.add(view);
         row.add(right, BorderLayout.EAST);
 
         return row;
@@ -931,16 +930,16 @@ public class FitnessManagerAppGUINew extends JFrame {
     // helpers
 
     // Keep small row buttons (Edit & View) from getting cropped in a 28px row
-    private void fitCompact(JButton b) {
-        b.setFont(ROW_FONT);
-        b.setMargin(new Insets(0, 8, 0, 8));        // thin vertical padding
-        int h = COMPACT_ROW_HEIGHT - 6;                                   // leave a little vertical breathing room
-        Dimension ps = b.getPreferredSize();
-        Dimension fixed = new Dimension(ps.width, h);
-        b.setPreferredSize(fixed);
-        b.setMinimumSize(fixed);
-        b.setMaximumSize(new Dimension(Integer.MAX_VALUE, h));
-    }
+    // private void fitCompact(JButton b) {
+    //     b.setFont(ROW_FONT);
+    //     b.setMargin(new Insets(0, 8, 0, 8));        // thin vertical padding
+    //     int h = COMPACT_ROW_HEIGHT - 6;                                   // leave a little vertical breathing room
+    //     Dimension ps = b.getPreferredSize();
+    //     Dimension fixed = new Dimension(ps.width, h);
+    //     b.setPreferredSize(fixed);
+    //     b.setMinimumSize(fixed);
+    //     b.setMaximumSize(new Dimension(Integer.MAX_VALUE, h));
+    // }
 
     private void addExerciseToThisSessionDialog(TrainingSession s) {
         if (manager.getExercises().isEmpty()) {
