@@ -2,7 +2,36 @@
     "sessions": [
         {
             "name": "Arms",
-            "exerciseSets": []
+            "exerciseSets": [
+                {
+                    "reps": 20,
+                    "sets": 2,
+                    "name": "Dips",
+                    "weight": 45,
+                    "targetMuscle": "Triceps"
+                },
+                {
+                    "reps": 12,
+                    "sets": 3,
+                    "name": "Lateral Raises",
+                    "weight": 40,
+                    "targetMuscle": "Side Delts"
+                },
+                {
+                    "reps": 7,
+                    "sets": 2,
+                    "name": "Tricep Pushdown",
+                    "weight": 300,
+                    "targetMuscle": "Triceps"
+                },
+                {
+                    "reps": 8,
+                    "sets": 3,
+                    "name": "Curls",
+                    "weight": 50,
+                    "targetMuscle": "Biceps"
+                }
+            ]
         },
         {
             "name": "Push",
@@ -10,7 +39,29 @@
         },
         {
             "name": "Pull",
-            "exerciseSets": []
+            "exerciseSets": [
+                {
+                    "reps": 20,
+                    "sets": 3,
+                    "name": "Pull-ups",
+                    "weight": 45,
+                    "targetMuscle": "Lats"
+                },
+                {
+                    "reps": 7,
+                    "sets": 2,
+                    "name": "Lat Pulldown",
+                    "weight": 300,
+                    "targetMuscle": "Lats"
+                },
+                {
+                    "reps": 8,
+                    "sets": 2,
+                    "name": "Curls",
+                    "weight": 50,
+                    "targetMuscle": "Biceps"
+                }
+            ]
         },
         {
             "name": "Legs",
@@ -45,6 +96,72 @@
             "name": "Squat",
             "weight": 405,
             "targetMuscle": "Legs"
+        },
+        {
+            "reps": 8,
+            "name": "Leg Press",
+            "weight": 500,
+            "targetMuscle": "Quad"
+        },
+        {
+            "reps": 6,
+            "name": "RDL's",
+            "weight": 315,
+            "targetMuscle": "Hamstrings"
+        },
+        {
+            "reps": 20,
+            "name": "Pull-ups",
+            "weight": 45,
+            "targetMuscle": "Lats"
+        },
+        {
+            "reps": 20,
+            "name": "Dips",
+            "weight": 45,
+            "targetMuscle": "Triceps"
+        },
+        {
+            "reps": 4,
+            "name": "Overhead Press",
+            "weight": 225,
+            "targetMuscle": "Front Delts"
+        },
+        {
+            "reps": 12,
+            "name": "Lateral Raises",
+            "weight": 40,
+            "targetMuscle": "Side Delts"
+        },
+        {
+            "reps": 7,
+            "name": "Lat Pulldown",
+            "weight": 300,
+            "targetMuscle": "Lats"
+        },
+        {
+            "reps": 7,
+            "name": "Tricep Pushdown",
+            "weight": 300,
+            "targetMuscle": "Triceps"
+        },
+        {
+            "reps": 12,
+            "name": "Overhead Tricep Extensions",
+            "weight": 180,
+            "targetMuscle": "Triceps"
+        },
+        {
+            "reps": 8,
+            "name": "Calf Raises",
+            "weight": 500,
+            "targetMuscle": "Calves"
+        },
+        {
+            "reps": 8,
+            "name": "Chest Fly",
+            "weight": 310,
+            "targetMuscle": "Chest"
         }
     ]
 }

@@ -17,6 +17,7 @@ import java.util.Map;
 import javax.swing.border.CompoundBorder;
 
 
+
 public class FitnessManagerAppGUINew extends JFrame {
 
     // ---------- Data / Persistence ----------
@@ -32,6 +33,7 @@ public class FitnessManagerAppGUINew extends JFrame {
     private JPanel sideBar;
     private JPanel mainArea;          // CardLayout
     private CardLayout cards;
+    
 
     // Compact list styling
     private static final int COMPACT_ROW_HEIGHT = 28;   // fixed row height
@@ -39,7 +41,7 @@ public class FitnessManagerAppGUINew extends JFrame {
     private static final Font ROW_FONT = new Font("SansSerif", Font.PLAIN, 12);
     private static final Insets BTN_INSETS = new Insets(2, 8, 2, 8); // compact button padding
 
-    // NEW: max chars for names shown in list rows
+    // max chars for names shown in list rows
     private static final int MAX_NAME_LEN = 10;
     private String ellipsize(String s, int max) {
         if (s == null) return "";
@@ -55,7 +57,7 @@ public class FitnessManagerAppGUINew extends JFrame {
     private JLabel programsSavedLbl;
     private int programsSavedCount = 0;
 
-    // NEW: dynamic list containers inside the two big cards
+    // dynamic list containers inside the two big cards
     private JPanel exercisesListPanel;   // vertical list of exercise rows
     private JPanel sessionsListPanel;    // vertical list of session rows
 
@@ -63,11 +65,57 @@ public class FitnessManagerAppGUINew extends JFrame {
     private JPanel sessionDetailPage;    // card for a single session view
     private JLabel sessionDetailTitle;
     private JPanel sessionDetailList;
+    private JPanel sessionDetailHeader;
+    private JButton sessionBackBtn;
+    private JPanel exerciseDetailPage;
+    private JLabel exerciseDetailTitle;
+    private JPanel exerciseDetailList;
+    private JPanel exerciseDetailHeader;
+    private JButton exerciseBackBtn;
+
 
     // Simple text output page (kept for “View All …” options)
     private JTextArea outputArea;
 
-    // Simple message helpers
+    // helpers
+
+    private void addExerciseToThisSessionDialog(TrainingSession s) {
+        if (manager.getExercises().isEmpty()) {
+            toast("No exercises available. Create one first.");
+            return;
+        }
+
+        String[] exerciseNames = manager.getExercises().stream()
+                .map(Exercise::getName).toArray(String[]::new);
+
+        JComboBox<String> exercise = new JComboBox<>(exerciseNames);
+        JTextField setsField = new JTextField();
+
+        Object[] fields = {
+                "Exercise:", exercise,
+                "Sets:",     setsField
+        };
+
+        int result = JOptionPane.showConfirmDialog(this, fields,
+                "Add Exercise to " + s.getName(),
+                JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+        if (result != JOptionPane.OK_OPTION) return;
+
+        try {
+            int sets = Integer.parseInt(setsField.getText().trim());
+            manager.addExerciseToSession(s.getName(), (String) exercise.getSelectedItem(), sets);
+            pushActivity("Added " + exercise.getSelectedItem() + " (" + sets + " sets) to " + s.getName());
+            // refresh the detail page and dashboard
+            openSessionDetail(s);
+            refreshAllUI();
+            toast("Exercise added to session.");
+        } catch (NumberFormatException ex) {
+            toastError("Invalid set number.");
+        }
+    }
+
+
     private void toast(String message) {
         JOptionPane.showMessageDialog(this, message, "Fitness Manager",
                 JOptionPane.INFORMATION_MESSAGE);
@@ -138,8 +186,20 @@ public class FitnessManagerAppGUINew extends JFrame {
 
         JPanel right = new JPanel();
         right.setOpaque(false);
-        JButton saveBtn = primaryButton("\uD83D\uDCBE  Save Program");
+        // JButton saveBtn = primaryButton("\uD83D\uDCBE  Save Program");
+        // JButton loadBtn = ghostButton("\uD83D\uDCC2  Load Program");
+        // both ghost (white) so they match; size them the same
+        JButton saveBtn = ghostButton("\uD83D\uDCBE  Save Program");
         JButton loadBtn = ghostButton("\uD83D\uDCC2  Load Program");
+
+        // make them roomier/wider
+        saveBtn.setBorder(new EmptyBorder(8, 16, 8, 16));
+        loadBtn.setBorder(new EmptyBorder(8, 16, 8, 16));
+
+        // optional: same width
+        Dimension lw = loadBtn.getPreferredSize();
+        saveBtn.setPreferredSize(lw);
+
         saveBtn.addActionListener(e -> saveData());
         loadBtn.addActionListener(e -> {
             loadData();
@@ -338,24 +398,65 @@ public class FitnessManagerAppGUINew extends JFrame {
         textPage.setBorder(new EmptyBorder(16, 16, 16, 16));
         textPage.add(new JScrollPane(outputArea), BorderLayout.CENTER);
 
-        // NEW: Session detail page
+        // session detail page
         sessionDetailPage = new JPanel(new BorderLayout());
         sessionDetailPage.setBorder(new EmptyBorder(16, 16, 16, 16));
+
         sessionDetailTitle = new JLabel("Session");
         sessionDetailTitle.setFont(new Font("SansSerif", Font.BOLD, 18));
 
-        JButton backBtn = ghostButton("\u2190  Back to Dashboard");
-        backBtn.addActionListener(e -> goHome());
-        JPanel head = new JPanel(new BorderLayout());
-        head.add(sessionDetailTitle, BorderLayout.WEST);
-        head.add(backBtn, BorderLayout.EAST);
-        sessionDetailPage.add(head, BorderLayout.NORTH);
+        // keep a persistent header we can rebuild on each session open
+        sessionDetailHeader = new JPanel(new BorderLayout());
+
+        // make Back to Dashboard bigger
+        sessionBackBtn = ghostButton("\u2190  Back to Dashboard");
+        sessionBackBtn.setBorder(new EmptyBorder(8, 16, 8, 16));   // bigger padding
+        sessionBackBtn.addActionListener(e -> goHome());
+
+        // temporary initial layout; openSessionDetail(...) will replace the WEST side
+        sessionDetailHeader.add(sessionDetailTitle, BorderLayout.WEST);
+        sessionDetailHeader.add(sessionBackBtn, BorderLayout.EAST);
+
+        sessionDetailPage.add(sessionDetailHeader, BorderLayout.NORTH);
+        // sessionDetailTitle = new JLabel("Session");
+        // sessionDetailTitle.setFont(new Font("SansSerif", Font.BOLD, 18));
 
         sessionDetailList = new JPanel();
         sessionDetailList.setLayout(new BoxLayout(sessionDetailList, BoxLayout.Y_AXIS));
         JScrollPane detailScroll = new JScrollPane(sessionDetailList);
         detailScroll.setBorder(new LineBorder(new Color(230, 232, 236)));
         sessionDetailPage.add(detailScroll, BorderLayout.CENTER);
+
+        // --- Exercise Detail page ---
+        exerciseDetailPage = new JPanel(new BorderLayout());
+        exerciseDetailPage.setBorder(new EmptyBorder(16, 16, 16, 16));
+
+        exerciseDetailTitle = new JLabel("Exercise");
+        exerciseDetailTitle.setFont(new Font("SansSerif", Font.BOLD, 18));
+
+        // header we can rebuild per-exercise
+        exerciseDetailHeader = new JPanel(new BorderLayout());
+
+        // Back button (bigger), same as session
+        exerciseBackBtn = ghostButton("\u2190  Back to Dashboard");
+        exerciseBackBtn.setBorder(new EmptyBorder(8, 16, 8, 16));
+        exerciseBackBtn.addActionListener(e -> goHome());
+
+        // initial header layout (will be replaced in openExerciseDetail)
+        exerciseDetailHeader.add(exerciseDetailTitle, BorderLayout.WEST);
+        exerciseDetailHeader.add(exerciseBackBtn, BorderLayout.EAST);
+        exerciseDetailPage.add(exerciseDetailHeader, BorderLayout.NORTH);
+
+        // list/body
+        exerciseDetailList = new JPanel();
+        exerciseDetailList.setLayout(new BoxLayout(exerciseDetailList, BoxLayout.Y_AXIS));
+        JScrollPane exDetailScroll = new JScrollPane(exerciseDetailList);
+        exDetailScroll.setBorder(new LineBorder(new Color(230, 232, 236)));
+        exerciseDetailPage.add(exDetailScroll, BorderLayout.CENTER);
+
+        // register card
+        mainArea.add(exerciseDetailPage, "exercise-detail");
+
 
         mainArea.add(home, "home");
         mainArea.add(textPage, "text");
@@ -559,6 +660,31 @@ public class FitnessManagerAppGUINew extends JFrame {
         }
     }
 
+    // private void viewExerciseDetails() {
+    //     if (manager.getExercises().isEmpty()) {
+    //         toast("No exercises to view.");
+    //         return;
+    //     }
+    //     String[] names = manager.getExercises().stream().map(Exercise::getName).toArray(String[]::new);
+    //     String choice = (String) JOptionPane.showInputDialog(
+    //             this, "Select exercise to view:", "Exercise Details",
+    //             JOptionPane.PLAIN_MESSAGE, null, names, names[0]
+    //     );
+    //     if (choice == null) return;
+
+    //     Exercise e = manager.findExerciseByName(choice);
+    //     if (e == null) {
+    //         toastError("Exercise not found.");
+    //         return;
+    //     }
+    //     String text = "Exercise Details\n\n" +
+    //             "Name: " + e.getName() + "\n" +
+    //             "Muscle Group: " + e.getTargetMuscle() + "\n" +
+    //             "Weight: " + e.getWeight() + " lbs\n" +
+    //             "Reps: " + e.getReps() + "\n";
+    //     outputArea.setText(text);
+    //     cards.show(mainArea, "text");
+    // }
     private void viewExerciseDetails() {
         if (manager.getExercises().isEmpty()) {
             toast("No exercises to view.");
@@ -576,14 +702,9 @@ public class FitnessManagerAppGUINew extends JFrame {
             toastError("Exercise not found.");
             return;
         }
-        String text = "Exercise Details\n\n" +
-                "Name: " + e.getName() + "\n" +
-                "Muscle Group: " + e.getTargetMuscle() + "\n" +
-                "Weight: " + e.getWeight() + " lbs\n" +
-                "Reps: " + e.getReps() + "\n";
-        outputArea.setText(text);
-        cards.show(mainArea, "text");
+        openExerciseDetail(e);
     }
+
 
     private void viewSessionExercises() {
         if (manager.getSessions().isEmpty()) {
@@ -604,6 +725,8 @@ public class FitnessManagerAppGUINew extends JFrame {
         }
         openSessionDetail(s);
     }
+
+
 
     private void viewAllExercisesAndSessions() {
         StringBuilder sb = new StringBuilder("All Exercises\n\n");
@@ -651,8 +774,6 @@ public class FitnessManagerAppGUINew extends JFrame {
             System.out.println(ev.toString());
         }
     }
-
-    // ---------- NEW: Live list rendering ----------
 
     private void refreshAllUI() {
         refreshHomeCounts();
@@ -718,6 +839,12 @@ public class FitnessManagerAppGUINew extends JFrame {
         right.add(edit);
         row.add(right, BorderLayout.EAST);
 
+        row.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        row.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override public void mouseClicked(java.awt.event.MouseEvent ev) { openExerciseDetail(e); }
+        });
+
+
         return row;
     }
 
@@ -755,11 +882,26 @@ public class FitnessManagerAppGUINew extends JFrame {
         return row;
     }
 
-
-
     private void openSessionDetail(TrainingSession s) {
         sessionDetailTitle.setText("Session — " + s.getName());
         sessionDetailList.removeAll();
+
+        // Build a left group: Title + [+ Add Exercise] button
+        JButton addBtn = ghostButton("\u2795  Add Exercise");
+        addBtn.setBorder(new EmptyBorder(6, 12, 6, 12));  // nice size
+        addBtn.addActionListener(e -> addExerciseToThisSessionDialog(s));
+
+        JPanel leftGroup = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+        leftGroup.setOpaque(false);
+        leftGroup.add(sessionDetailTitle);
+        leftGroup.add(addBtn);
+
+        // Replace header contents
+        sessionDetailHeader.removeAll();
+        sessionDetailHeader.add(leftGroup, BorderLayout.WEST);
+        sessionDetailHeader.add(sessionBackBtn, BorderLayout.EAST);
+        sessionDetailHeader.revalidate();
+        sessionDetailHeader.repaint();
 
         if (s.getExerciseSets().isEmpty()) {
             sessionDetailList.add(emptyHint("No exercises in this session yet."));
@@ -803,6 +945,54 @@ public class FitnessManagerAppGUINew extends JFrame {
         sessionDetailList.repaint();
         cards.show(mainArea, "session-detail");
     }
+
+    private void openExerciseDetail(Exercise e) {
+        // Title + [Edit Exercise] on the left, Back on the right
+        exerciseDetailTitle.setText("Exercise \u2014 " + e.getName());
+
+        JButton editBtn = ghostButton("\u270E  Edit Exercise");
+        editBtn.setBorder(new EmptyBorder(6, 12, 6, 12));
+        editBtn.addActionListener(a -> {
+            openEditExerciseDialog(e);
+            // refresh detail and dashboard after edit
+            openExerciseDetail(e);
+            refreshAllUI();
+        });
+
+        JPanel leftGroup = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+        leftGroup.setOpaque(false);
+        leftGroup.add(exerciseDetailTitle);
+        leftGroup.add(editBtn);
+
+        exerciseDetailHeader.removeAll();
+        exerciseDetailHeader.add(leftGroup, BorderLayout.WEST);
+        exerciseDetailHeader.add(exerciseBackBtn, BorderLayout.EAST);
+        exerciseDetailHeader.revalidate();
+        exerciseDetailHeader.repaint();
+
+        // Body: show one compact row with the full details
+        exerciseDetailList.removeAll();
+
+        String text = e.getName() + " \u2014 " + e.getTargetMuscle()
+                + " | " + e.getWeight() + " lbs | " + e.getReps() + " reps";
+
+        JPanel row = new JPanel(new BorderLayout());
+        row.setBackground(Color.WHITE);
+        row.setBorder(new LineBorder(new Color(230, 232, 236)));
+        row.add(new JLabel("  " + text), BorderLayout.CENTER);
+        row.setPreferredSize(new Dimension(Integer.MAX_VALUE, COMPACT_ROW_HEIGHT));
+        row.setMaximumSize(new Dimension(Integer.MAX_VALUE, COMPACT_ROW_HEIGHT));
+        row.setMinimumSize(new Dimension(0, COMPACT_ROW_HEIGHT));
+
+        exerciseDetailList.add(row);
+        exerciseDetailList.add(Box.createVerticalStrut(6));
+
+        exerciseDetailList.revalidate();
+        exerciseDetailList.repaint();
+
+        cards.show(mainArea, "exercise-detail");
+    }
+
 
     // ---------- Small helpers / styling ----------
 
@@ -874,15 +1064,7 @@ public class FitnessManagerAppGUINew extends JFrame {
         return l;
     }
 
-    // private JButton leftNav(String text) {
-    //     JButton b = new JButton(text);
-    //     b.setFocusable(false);
-    //     b.setHorizontalAlignment(SwingConstants.LEFT);
-    //     b.setMaximumSize(new Dimension(Integer.MAX_VALUE, 36));
-    //     b.setBackground(Color.WHITE);
-    //     b.setBorder(new LineBorder(new Color(230, 232, 236)));
-    //     return b;
-    // }
+    
     private JButton leftNav(String text) {
         JButton b = new JButton(text);
         b.setFocusable(false);
@@ -890,22 +1072,12 @@ public class FitnessManagerAppGUINew extends JFrame {
         b.setMaximumSize(new Dimension(Integer.MAX_VALUE, 36));
         b.setBackground(Color.WHITE);
 
-        // move the text to the right so the emoji/icon doesn't sit on the border
+        
         b.setMargin(new Insets(0, 0, 0, 0));               // margin = 0, use inner padding below
         b.setBorder(new CompoundBorder(
-                new LineBorder(new Color(230, 232, 236)),  // outer line
-                new EmptyBorder(0, 28, 0, 12)              // inner padding: LEFT=28px, RIGHT=12px
+                new LineBorder(new Color(230, 232, 236)),                  // outer line
+                new EmptyBorder(0, 28, 0, 12)             // inner padding: LEFT=28px, RIGHT=12px
         ));
-        return b;
-    }
-
-
-    private JButton primaryButton(String text) {
-        JButton b = new JButton(text);
-        b.setFocusable(false);
-        b.setBackground(new Color(28, 100, 242));
-        b.setForeground(Color.WHITE);
-        b.setBorder(new EmptyBorder(8, 12, 8, 12));
         return b;
     }
 
