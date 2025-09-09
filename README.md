@@ -1,5 +1,4 @@
-# project-m6c8u
-CPSC 210, Section 202, Term 2 Project (Fitness Manager App)
+# Fitness Manager App
 
 ### *What does it do?*
 The Fitness Manager App will provide a way for someone to track their exercise. More specifically, it will be used to keep track of different exercises in a persons training routine, including the exercise name, targetting muscle group, and the amount of reps and weight (lbs) that the exercise should be executed for. The Fitness Manager App will allow a person to store all of their created exercises into a specific training session, for example, I would be able to create a few exercises that I enjoy and target my upper body, and then add all of those exercises to a training session called upper body day or something, also specifying how many sets that I want to do each exercise for in that particular training session.
