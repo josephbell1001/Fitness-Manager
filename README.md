@@ -103,7 +103,7 @@ A simple desktop app I wrote in Java to create custom workout plans. I keep a li
     }
   ]
 }
-
+```
 File saved at: `./data/fitness_manager.json`
 
 ---
