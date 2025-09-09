@@ -103,3 +103,25 @@ A simple desktop app I wrote in Java to create custom workout plans. I keep a li
     }
   ]
 }
+
+File saved at: `./data/fitness_manager.json`
+
+---
+
+## ⚙️ Getting Started
+
+### Requirements
+- Java 17+ (Java 11 may also work)  
+- [`org.json`](https://stleary.github.io/JSON-java/) dependency on classpath  
+
+### Run from an IDE
+1. Import the project  
+2. Add `org.json` dependency  
+3. Run `ui.FitnessManagerAppGUINew`
+
+### Run from Command Line
+
+**Windows (PowerShell):**
+```powershell
+javac -cp "lib\json-20231013.jar;src" -d out (Get-ChildItem -Recurse -Filter *.java | % {$_.FullName})
+java -cp "out;lib\json-20231013.jar" ui.FitnessManagerAppGUINew
