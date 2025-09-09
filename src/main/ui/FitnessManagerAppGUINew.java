@@ -122,9 +122,6 @@ public class FitnessManagerAppGUINew extends JFrame {
 
         JPanel right = new JPanel();
         right.setOpaque(false);
-        // JButton saveBtn = primaryButton("\uD83D\uDCBE  Save Program");
-        // JButton loadBtn = ghostButton("\uD83D\uDCC2  Load Program");
-        // both ghost (white) so they match; size them the same
         JButton saveBtn = ghostButton("\uD83D\uDCBE  Save Program");
         JButton loadBtn = ghostButton("\uD83D\uDCC2  Load Program");
 
@@ -345,10 +342,7 @@ public class FitnessManagerAppGUINew extends JFrame {
         // temporary initial layout; openSessionDetail(...) will replace the WEST side
         sessionDetailHeader.add(sessionDetailTitle, BorderLayout.WEST);
         sessionDetailHeader.add(sessionBackBtn, BorderLayout.EAST);
-
         sessionDetailPage.add(sessionDetailHeader, BorderLayout.NORTH);
-        // sessionDetailTitle = new JLabel("Session");
-        // sessionDetailTitle.setFont(new Font("SansSerif", Font.BOLD, 18));
 
         sessionDetailList = new JPanel();
         sessionDetailList.setLayout(new BoxLayout(sessionDetailList, BoxLayout.Y_AXIS));
@@ -589,31 +583,6 @@ public class FitnessManagerAppGUINew extends JFrame {
         }
     }
 
-    // private void viewExerciseDetails() {
-    //     if (manager.getExercises().isEmpty()) {
-    //         toast("No exercises to view.");
-    //         return;
-    //     }
-    //     String[] names = manager.getExercises().stream().map(Exercise::getName).toArray(String[]::new);
-    //     String choice = (String) JOptionPane.showInputDialog(
-    //             this, "Select exercise to view:", "Exercise Details",
-    //             JOptionPane.PLAIN_MESSAGE, null, names, names[0]
-    //     );
-    //     if (choice == null) return;
-
-    //     Exercise e = manager.findExerciseByName(choice);
-    //     if (e == null) {
-    //         toastError("Exercise not found.");
-    //         return;
-    //     }
-    //     String text = "Exercise Details\n\n" +
-    //             "Name: " + e.getName() + "\n" +
-    //             "Muscle Group: " + e.getTargetMuscle() + "\n" +
-    //             "Weight: " + e.getWeight() + " lbs\n" +
-    //             "Reps: " + e.getReps() + "\n";
-    //     outputArea.setText(text);
-    //     cards.show(mainArea, "text");
-    // }
     private void viewExerciseDetails() {
         if (manager.getExercises().isEmpty()) {
             toast("No exercises to view.");
@@ -634,7 +603,6 @@ public class FitnessManagerAppGUINew extends JFrame {
         openExerciseDetail(e);
     }
 
-
     private void viewSessionExercises() {
         if (manager.getSessions().isEmpty()) {
             toast("No sessions to view.");
@@ -654,8 +622,6 @@ public class FitnessManagerAppGUINew extends JFrame {
         }
         openSessionDetail(s);
     }
-
-
 
     private void viewAllExercisesAndSessions() {
         StringBuilder sb = new StringBuilder("All Exercises\n\n");
@@ -928,18 +894,6 @@ public class FitnessManagerAppGUINew extends JFrame {
 
 
     // helpers
-
-    // Keep small row buttons (Edit & View) from getting cropped in a 28px row
-    // private void fitCompact(JButton b) {
-    //     b.setFont(ROW_FONT);
-    //     b.setMargin(new Insets(0, 8, 0, 8));        // thin vertical padding
-    //     int h = COMPACT_ROW_HEIGHT - 6;                                   // leave a little vertical breathing room
-    //     Dimension ps = b.getPreferredSize();
-    //     Dimension fixed = new Dimension(ps.width, h);
-    //     b.setPreferredSize(fixed);
-    //     b.setMinimumSize(fixed);
-    //     b.setMaximumSize(new Dimension(Integer.MAX_VALUE, h));
-    // }
 
     private void addExerciseToThisSessionDialog(TrainingSession s) {
         if (manager.getExercises().isEmpty()) {
