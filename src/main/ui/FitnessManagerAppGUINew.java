@@ -14,6 +14,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Map;
+import javax.swing.border.CompoundBorder;
+
 
 public class FitnessManagerAppGUINew extends JFrame {
 
@@ -144,6 +146,18 @@ public class FitnessManagerAppGUINew extends JFrame {
             refreshAllUI();
             pushActivity("Loaded program from disk.");
         });
+
+        // ensure Save is visibly blue & nicely padded
+        saveBtn.setBackground(new Color(28, 100, 242));
+        saveBtn.setForeground(Color.WHITE);
+        saveBtn.setBorder(new EmptyBorder(8, 16, 8, 16));
+
+        // make Load a bit bigger/wider
+        loadBtn.setBorder(new EmptyBorder(8, 16, 8, 16));
+        Dimension sd = saveBtn.getPreferredSize();
+        loadBtn.setPreferredSize(new Dimension((int)(sd.width * 1.10), sd.height)); // ~10% wider than Save
+ 
+
         right.add(saveBtn);
         right.add(Box.createHorizontalStrut(8));
         right.add(loadBtn);
@@ -727,7 +741,7 @@ public class FitnessManagerAppGUINew extends JFrame {
         lbl.setBorder(new EmptyBorder(0, COMPACT_HPAD, 0, 0));
         row.add(lbl, BorderLayout.CENTER);
 
-        JButton view = ghostButton("Edit / View");
+        JButton view = ghostButton("View");
         view.setFont(ROW_FONT);
         view.setMargin(BTN_INSETS);
         view.setFocusable(false);
@@ -860,15 +874,31 @@ public class FitnessManagerAppGUINew extends JFrame {
         return l;
     }
 
+    // private JButton leftNav(String text) {
+    //     JButton b = new JButton(text);
+    //     b.setFocusable(false);
+    //     b.setHorizontalAlignment(SwingConstants.LEFT);
+    //     b.setMaximumSize(new Dimension(Integer.MAX_VALUE, 36));
+    //     b.setBackground(Color.WHITE);
+    //     b.setBorder(new LineBorder(new Color(230, 232, 236)));
+    //     return b;
+    // }
     private JButton leftNav(String text) {
         JButton b = new JButton(text);
         b.setFocusable(false);
-        b.setHorizontalAlignment(SwingConstants.LEFT);
+        b.setHorizontalAlignment(SwingConstants.LEFT);     // keep left-aligned inside the box
         b.setMaximumSize(new Dimension(Integer.MAX_VALUE, 36));
         b.setBackground(Color.WHITE);
-        b.setBorder(new LineBorder(new Color(230, 232, 236)));
+
+        // move the text to the right so the emoji/icon doesn't sit on the border
+        b.setMargin(new Insets(0, 0, 0, 0));               // margin = 0, use inner padding below
+        b.setBorder(new CompoundBorder(
+                new LineBorder(new Color(230, 232, 236)),  // outer line
+                new EmptyBorder(0, 28, 0, 12)              // inner padding: LEFT=28px, RIGHT=12px
+        ));
         return b;
     }
+
 
     private JButton primaryButton(String text) {
         JButton b = new JButton(text);
@@ -924,5 +954,4 @@ public class FitnessManagerAppGUINew extends JFrame {
 }
 
 // I KNOW YOU SEE THIS, TRY TO FIX THE GITHUB POSTING IT FROM MY OTHER ACCOUNT IDK WHY ITS DOING THAT THIS IS A TEST TO SEE THAT BUT ALSO IMPORTANT
-//fix menus
-//make it so that the buttons are centered, rn theyre off centered, all of them
+//fix menus!

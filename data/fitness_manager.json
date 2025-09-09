@@ -18,7 +18,13 @@
         },
         {
             "name": "Full Body",
-            "exerciseSets": []
+            "exerciseSets": [{
+                "reps": 8,
+                "sets": 3,
+                "name": "Curls",
+                "weight": 50,
+                "targetMuscle": "Biceps"
+            }]
         }
     ],
     "exercises": [
