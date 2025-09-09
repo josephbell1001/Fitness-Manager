@@ -83,6 +83,18 @@
                 "weight": 50,
                 "targetMuscle": "Biceps"
             }]
+        },
+        {
+            "name": "test1",
+            "exerciseSets": []
+        },
+        {
+            "name": "test2",
+            "exerciseSets": []
+        },
+        {
+            "name": "test3",
+            "exerciseSets": []
         }
     ],
     "exercises": [
