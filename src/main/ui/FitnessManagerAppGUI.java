@@ -45,8 +45,8 @@ public class FitnessManagerAppGUI extends JFrame {
         titlePanel.setLayout(new BoxLayout(titlePanel, BoxLayout.X_AXIS));
         titlePanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        ImageIcon leftIcon = new ImageIcon("/Users/josephbell/Downloads/project-m6c8u/data/LeftBicep.png");
-        ImageIcon rightIcon = new ImageIcon("/Users/josephbell/Downloads/project-m6c8u/data/RightBicep.png");
+        ImageIcon leftIcon = new ImageIcon("/ui/img/LeftBicep.png");
+        ImageIcon rightIcon = new ImageIcon("/ui/img/LeftRicep.png");
 
         JLabel leftLabel = new JLabel(leftIcon);
         JLabel rightLabel = new JLabel(rightIcon);

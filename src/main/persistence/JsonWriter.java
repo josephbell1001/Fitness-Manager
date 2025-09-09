@@ -19,9 +19,18 @@ public class JsonWriter {
 
     // MODIFIES: this
     // EFFECTS: opens writer; throws FileNotFoundException if file cannot be opened
+    // public void open() throws FileNotFoundException {
+    //     writer = new PrintWriter(new File(destination));
+    // }
     public void open() throws FileNotFoundException {
-        writer = new PrintWriter(new File(destination));
+        File file = new File(destination);
+        File parent = file.getParentFile();
+        if (parent != null && !parent.exists()) {
+            parent.mkdirs(); // create ./data on first run
+        }
+        writer = new PrintWriter(file);
     }
+
 
     // MODIFIES: this
     // EFFECTS: writes JSON representation of FitnessManager to file
