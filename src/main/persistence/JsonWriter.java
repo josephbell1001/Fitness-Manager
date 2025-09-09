@@ -5,8 +5,6 @@ import org.json.JSONObject;
 
 import java.io.*;
 
-// JsonWriter class referenced from the WorkRoomApp
-// https://github.students.cs.ubc.ca/CPSC210/JsonSerializationDemo
 
 // Represents a writer that writes JSON representation of FitnessManager to file
 public class JsonWriter {

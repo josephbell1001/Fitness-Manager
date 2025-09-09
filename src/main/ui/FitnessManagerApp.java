@@ -11,8 +11,6 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Scanner;
 
-// Referenced from the TellerApp
-// https://github.students.cs.ubc.ca/CPSC210/TellerApp
 
 public class FitnessManagerApp {
     private static final String JSON_STORE = "./data/fitness_manager.json";

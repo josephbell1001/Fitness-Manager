@@ -12,9 +12,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.stream.Stream;
 
-// JsonReader class referenced from the WorkRoomApp
-// https://github.students.cs.ubc.ca/CPSC210/JsonSerializationDemo
-
 // Represents a reader that reads FitnessManager from JSON data stored in file
 public class JsonReader {
     private String source; // Source file path

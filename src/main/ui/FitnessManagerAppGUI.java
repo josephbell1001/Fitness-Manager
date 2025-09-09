@@ -9,8 +9,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Map;
 
-// Referenced from the SimpleDrawingPlayer-Starter
-// https://github.students.cs.ubc.ca/CPSC210/SimpleDrawingPlayer-Starter
 
 public class FitnessManagerAppGUI extends JFrame {
     private static final String JSON_STORE = "./data/fitness_manager.json";

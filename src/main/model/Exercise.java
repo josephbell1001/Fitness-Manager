@@ -4,9 +4,6 @@ import org.json.JSONObject;
 
 import persistence.Writable;
 
-// Referenced from the TellerApp
-// https://github.students.cs.ubc.ca/CPSC210/TellerApp
-
 // Represents an exercise having a name, target muscle (main muscle group that the exercise is
 // meant to target), weight (in pounds (lbs)), and reps (repetitions the exercise should be done for)
 public class Exercise implements Writable {
