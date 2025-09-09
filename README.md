@@ -194,7 +194,7 @@ data/
 
 ## 📜 License
 
-- Personal project — feel free to learn from or fork. If you use this, a note of credit is appreciated.
+- Personal project — feel free to learn from or fork, happy training!
 
 ## 🙏 Credits
 
