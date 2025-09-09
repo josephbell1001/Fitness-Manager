@@ -257,7 +257,7 @@ public class FitnessManagerAppGUINew extends JFrame {
         sessionsCard.setBorder(new LineBorder(new Color(230, 232, 236)));
 
         JPanel sesHeader = cardHeader("\uD83D\uDCC5  Training Sessions",
-                "Build custom training sessions by combining exercises with their sets.");
+                "Build custom training sessions by combining various exercises and listing each ones number of sets.");
         sessionsCard.add(sesHeader, BorderLayout.NORTH);
 
         sessionsListPanel = new JPanel();
