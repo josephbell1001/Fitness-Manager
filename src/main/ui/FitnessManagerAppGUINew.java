@@ -157,8 +157,8 @@ public class FitnessManagerAppGUINew extends JFrame {
         sideBar.setBackground(new Color(246, 248, 251));
         sideBar.setPreferredSize(new Dimension(260, 100));
 
-        sideBar.add(sectionLabel("ACTIONS"));
-        sideBar.add(groupLabel("EXERCISE MANAGEMENT"));
+        sideBar.add(sectionLabel("MENU:"));
+        sideBar.add(groupLabel("EXERCISE MANAGER"));
 
         JButton createExercise = leftNav("\u2795  Create Exercise");
         createExercise.addActionListener(e -> showCreateExerciseDialog());
@@ -174,7 +174,7 @@ public class FitnessManagerAppGUINew extends JFrame {
         sideBar.add(addToSession);
 
         sideBar.add(Box.createVerticalStrut(16));
-        sideBar.add(groupLabel("SESSION MANAGEMENT"));
+        sideBar.add(groupLabel("SESSION MANAGER"));
 
         JButton createSession = leftNav("\uD83D\uDCC5  Create Training Session");
         createSession.addActionListener(e -> showCreateSessionDialog());
@@ -190,7 +190,7 @@ public class FitnessManagerAppGUINew extends JFrame {
         sideBar.add(viewSessions);
 
         sideBar.add(Box.createVerticalStrut(16));
-        sideBar.add(groupLabel("PROGRAM MANAGEMENT"));
+        sideBar.add(groupLabel("SAVE/LOAD & QUIT"));
 
         JButton saveBtn = leftNav("\uD83D\uDCBE  Save Program");
         saveBtn.addActionListener(e -> saveData());
