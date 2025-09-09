@@ -125,3 +125,10 @@ File saved at: `./data/fitness_manager.json`
 ```powershell
 javac -cp "lib\json-20231013.jar;src" -d out (Get-ChildItem -Recurse -Filter *.java | % {$_.FullName})
 java -cp "out;lib\json-20231013.jar" ui.FitnessManagerAppGUINew
+```
+
+**Linux/macOS:**
+find src -name "*.java" > sources.txt
+javac -cp "lib/json-20231013.jar:src" -d out @sources.txt
+java -cp "out:lib/json-20231013.jar" ui.FitnessManagerAppGUINew
+
