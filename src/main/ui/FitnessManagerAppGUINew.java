@@ -231,7 +231,7 @@ public class FitnessManagerAppGUINew extends JFrame {
         exercisesCard.setBorder(new LineBorder(new Color(230, 232, 236)));
 
         JPanel exHeader = cardHeader("\uD83D\uDCAA  Exercises",
-                "Create and manage your exercise library with detailed instructions and muscle groups.");
+                "Create and manage your exercise library. Provide a name, target muscle, weight, and reps for a given exercise.");
         exercisesCard.add(exHeader, BorderLayout.NORTH);
 
         exercisesListPanel = new JPanel();
@@ -257,7 +257,7 @@ public class FitnessManagerAppGUINew extends JFrame {
         sessionsCard.setBorder(new LineBorder(new Color(230, 232, 236)));
 
         JPanel sesHeader = cardHeader("\uD83D\uDCC5  Training Sessions",
-                "Build structured workout sessions by combining exercises with sets and reps.");
+                "Build custom training sessions by combining exercises with their sets.");
         sessionsCard.add(sesHeader, BorderLayout.NORTH);
 
         sessionsListPanel = new JPanel();
