@@ -19,14 +19,14 @@ import javax.swing.border.CompoundBorder;
 
 public class FitnessManagerAppGUINew extends JFrame {
 
-    // ---------- Data / Persistence ----------
+    // Data / Persistence
     private static final String JSON_STORE = "./data/fitness_manager.json";
     private final JsonWriter jsonWriter = new JsonWriter(JSON_STORE);
     private final JsonReader jsonReader = new JsonReader(JSON_STORE);
     private FitnessManager manager = new FitnessManager();
 
 
-    // ---------- UI: top / left / main ----------
+    // UI: top / left / main
     private JPanel topBar;
     private JPanel sideBar;
     private JPanel mainArea;          // CardLayout
@@ -78,7 +78,7 @@ public class FitnessManagerAppGUINew extends JFrame {
     // Simple text output page (kept for “View All …” options)
     private JTextArea outputArea;
 
-    // ui
+    // UI Construction
 
     private void buildUI() {
         setLayout(new BorderLayout());
@@ -250,7 +250,6 @@ public class FitnessManagerAppGUINew extends JFrame {
         startExerciseCTA.addActionListener(e -> showCreateExerciseDialog());
         exercisesCard.add(startExerciseCTA, BorderLayout.SOUTH);
 
-
         // Sessions card (title + description + live list + CTA)
         JPanel sessionsCard = new JPanel(new BorderLayout());
         sessionsCard.setBackground(Color.WHITE);
@@ -411,7 +410,7 @@ public class FitnessManagerAppGUINew extends JFrame {
         return panel;
     }
 
-    // ---------- Dialogs / Actions (functionality preserved + list refresh) ----------
+    // Dialogs / Actions (functionality preserved + list refresh)
 
     private void showCreateExerciseDialog() {
         JTextField nameField = new JTextField();
@@ -725,19 +724,8 @@ public class FitnessManagerAppGUINew extends JFrame {
         lbl.setBorder(new EmptyBorder(0, COMPACT_HPAD, 0, 0));
         row.add(lbl, BorderLayout.CENTER);
 
-        // JButton edit = ghostButton("Edit");
-        // edit.setFocusable(false);
-        // fitCompact(edit);
-        // edit.addActionListener(a -> {
-        //     openEditExerciseDialog(e);
-        //     // refresh rows after edit
-        //     refreshAllUI();
-        // });
-
         JPanel right = new JPanel(new FlowLayout(FlowLayout.RIGHT, 6, 3));
         right.setOpaque(false);
-        // right.add(edit);
-        // row.add(right, BorderLayout.EAST);
 
         row.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         row.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -767,11 +755,6 @@ public class FitnessManagerAppGUINew extends JFrame {
         lbl.setFont(ROW_FONT);
         lbl.setBorder(new EmptyBorder(0, COMPACT_HPAD, 0, 0));
         row.add(lbl, BorderLayout.CENTER);
-
-        // JButton view = ghostButton("View");
-        // view.setFocusable(false);
-        // fitCompact(view);
-        // view.addActionListener(a -> openSessionDetail(s)); // button still works
 
         JPanel right = new JPanel(new FlowLayout(FlowLayout.RIGHT, 6, 3));
         right.setOpaque(false);
@@ -1169,6 +1152,3 @@ public class FitnessManagerAppGUINew extends JFrame {
         new FitnessManagerAppGUINew();
     }
 }
-
-// I KNOW YOU SEE THIS, TRY TO FIX THE GITHUB POSTING IT FROM MY OTHER ACCOUNT IDK WHY ITS DOING THAT THIS IS A TEST TO SEE THAT BUT ALSO IMPORTANT
-//fix menus!
