@@ -160,11 +160,11 @@ data/
 
 ## 🔧 Tips
 
-Compact UI → tweak COMPACT_ROW_HEIGHT or BTN_INSETS if buttons look too squished
+- Compact UI → tweak COMPACT_ROW_HEIGHT or BTN_INSETS if buttons look too squished
 
-Quick Home → click the app title or bicep icons in the top bar
+- Quick Home → click the app title or bicep icons in the top bar
 
-Event Log → printed to console on quit
+- Event Log → printed to console on quit
 
 ---
 
