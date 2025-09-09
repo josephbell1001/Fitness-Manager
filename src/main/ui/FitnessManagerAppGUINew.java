@@ -15,13 +15,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Map;
 
-/**
- * Dashboard-style GUI that matches the provided mockup while preserving all
- * behaviors from FitnessManagerAppGUI (create/edit exercises, sessions,
- * add-to-session, clear, view, save/load, quit w/ EventLog).
- *
- * Drop this file in src/main/ui and run.
- */
 public class FitnessManagerAppGUINew extends JFrame {
 
     // ---------- Data / Persistence ----------
@@ -30,13 +23,21 @@ public class FitnessManagerAppGUINew extends JFrame {
     private final JsonReader jsonReader = new JsonReader(JSON_STORE);
     private FitnessManager manager = new FitnessManager();
 
-    // ---------- UI: top / left / main / footer ----------
+    
+
+    // ---------- UI: top / left / main ----------
     private JPanel topBar;
     private JPanel sideBar;
     private JPanel mainArea;          // CardLayout
     private CardLayout cards;
 
-    // "Home" widgets
+    // Compact list styling
+    private static final int COMPACT_ROW_HEIGHT = 28;   // fixed row height
+    private static final int COMPACT_HPAD = 8;          // left/right padding
+    private static final Font ROW_FONT = new Font("SansSerif", Font.PLAIN, 12);
+    private static final Insets BTN_INSETS = new Insets(2, 8, 2, 8); // compact button padding
+
+    // Dashboard widgets
     private DefaultListModel<String> activityModel;
     private JList<String> activityList;
     private JLabel totalExercisesLbl;
@@ -44,8 +45,29 @@ public class FitnessManagerAppGUINew extends JFrame {
     private JLabel programsSavedLbl;
     private int programsSavedCount = 0;
 
-    // Single reusable text area page (for simple views)
+    // NEW: dynamic list containers inside the two big cards
+    private JPanel exercisesListPanel;   // vertical list of exercise rows
+    private JPanel sessionsListPanel;    // vertical list of session rows
+
+    // Session detail page
+    private JPanel sessionDetailPage;    // card for a single session view
+    private JLabel sessionDetailTitle;
+    private JPanel sessionDetailList;
+
+    // Simple text output page (kept for “View All …” options)
     private JTextArea outputArea;
+
+    // Simple message helpers
+    private void toast(String message) {
+        JOptionPane.showMessageDialog(this, message, "Fitness Manager",
+                JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    private void toastError(String message) {
+        JOptionPane.showMessageDialog(this, message, "Fitness Manager",
+                JOptionPane.ERROR_MESSAGE);
+    }
+
 
     public FitnessManagerAppGUINew() {
         super("Fitness Manager");
@@ -55,7 +77,6 @@ public class FitnessManagerAppGUINew extends JFrame {
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(new java.awt.event.WindowAdapter() {
             @Override public void windowClosing(java.awt.event.WindowEvent e) {
-                // mirror prior behavior: print event log then exit
                 printEventLogToConsole();
                 System.exit(0);
             }
@@ -78,7 +99,6 @@ public class FitnessManagerAppGUINew extends JFrame {
         topBar.setBorder(new EmptyBorder(12, 16, 12, 16));
         topBar.setBackground(Color.WHITE);
 
-        // Left: Title with small icons (best-effort loading from /ui/img)
         JPanel left = new JPanel();
         left.setOpaque(false);
         left.setLayout(new BoxLayout(left, BoxLayout.X_AXIS));
@@ -88,11 +108,24 @@ public class FitnessManagerAppGUINew extends JFrame {
         title.setFont(new Font("SansSerif", Font.BOLD, 20));
         JLabel rightIcon = new JLabel(loadScaledIcon("/ui/img/RightBicep.png", 32, 25));
 
+        // click-to-home on icons + title
+        title.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        title.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override public void mouseClicked(java.awt.event.MouseEvent e) { goHome(); }
+        });
+        leftIcon.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        rightIcon.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        leftIcon.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override public void mouseClicked(java.awt.event.MouseEvent e) { goHome(); }
+        });
+        rightIcon.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override public void mouseClicked(java.awt.event.MouseEvent e) { goHome(); }
+        });
+
         left.add(leftIcon);
         left.add(title);
         left.add(rightIcon);
 
-        // Right: Save / Load buttons
         JPanel right = new JPanel();
         right.setOpaque(false);
         JButton saveBtn = primaryButton("\uD83D\uDCBE  Save Program");
@@ -100,7 +133,7 @@ public class FitnessManagerAppGUINew extends JFrame {
         saveBtn.addActionListener(e -> saveData());
         loadBtn.addActionListener(e -> {
             loadData();
-            refreshHomeCounts();
+            refreshAllUI();
             pushActivity("Loaded program from disk.");
         });
         right.add(saveBtn);
@@ -120,7 +153,6 @@ public class FitnessManagerAppGUINew extends JFrame {
         sideBar.setBackground(new Color(246, 248, 251));
         sideBar.setPreferredSize(new Dimension(260, 100));
 
-        // Section: Exercise Management
         sideBar.add(sectionLabel("ACTIONS"));
         sideBar.add(groupLabel("EXERCISE MANAGEMENT"));
 
@@ -162,7 +194,7 @@ public class FitnessManagerAppGUINew extends JFrame {
         JButton loadBtn = leftNav("\uD83D\uDCC2  Load Program");
         loadBtn.addActionListener(e -> {
             loadData();
-            refreshHomeCounts();
+            refreshAllUI();
             pushActivity("Loaded program from disk.");
         });
 
@@ -189,24 +221,47 @@ public class FitnessManagerAppGUINew extends JFrame {
         home.setBorder(new EmptyBorder(16, 16, 16, 16));
         home.setBackground(new Color(248, 250, 252));
 
-        // Welcome + two feature cards
+        // === Top row: 2 big cards with live lists ===
         JPanel topRow = new JPanel(new GridLayout(1, 2, 16, 16));
         topRow.setOpaque(false);
 
-        JPanel exercisesCard = bigCard(
-                "\uD83D\uDCAA  Exercises",
-                "Create and manage your exercise library with detailed instructions "
-                        + "and muscle groups."
-        );
+        // Exercises card (title + description + live list + CTA)
+        JPanel exercisesCard = new JPanel(new BorderLayout());
+        exercisesCard.setBackground(Color.WHITE);
+        exercisesCard.setBorder(new LineBorder(new Color(230, 232, 236)));
+
+        JPanel exHeader = cardHeader("\uD83D\uDCAA  Exercises",
+                "Create and manage your exercise library with detailed instructions and muscle groups.");
+        exercisesCard.add(exHeader, BorderLayout.NORTH);
+
+        exercisesListPanel = new JPanel();
+        exercisesListPanel.setOpaque(false);
+        exercisesListPanel.setLayout(new BoxLayout(exercisesListPanel, BoxLayout.Y_AXIS));
+        JScrollPane exScroll = new JScrollPane(exercisesListPanel);
+        exScroll.setBorder(null);
+        exercisesCard.add(exScroll, BorderLayout.CENTER);
+
         JButton startExercise = ghostButton("Start by creating your first exercise");
         startExercise.setHorizontalAlignment(SwingConstants.LEFT);
         startExercise.addActionListener(e -> showCreateExerciseDialog());
         exercisesCard.add(startExercise, BorderLayout.SOUTH);
 
-        JPanel sessionsCard = bigCard(
-                "\uD83D\uDCC5  Training Sessions",
-                "Build structured workout sessions by combining exercises with sets and reps."
-        );
+        // Sessions card (title + description + live list + CTA)
+        JPanel sessionsCard = new JPanel(new BorderLayout());
+        sessionsCard.setBackground(Color.WHITE);
+        sessionsCard.setBorder(new LineBorder(new Color(230, 232, 236)));
+
+        JPanel sesHeader = cardHeader("\uD83D\uDCC5  Training Sessions",
+                "Build structured workout sessions by combining exercises with sets and reps.");
+        sessionsCard.add(sesHeader, BorderLayout.NORTH);
+
+        sessionsListPanel = new JPanel();
+        sessionsListPanel.setOpaque(false);
+        sessionsListPanel.setLayout(new BoxLayout(sessionsListPanel, BoxLayout.Y_AXIS));
+        JScrollPane sesScroll = new JScrollPane(sessionsListPanel);
+        sesScroll.setBorder(null);
+        sessionsCard.add(sesScroll, BorderLayout.CENTER);
+
         JButton planBtn = ghostButton("Plan your training schedule");
         planBtn.setHorizontalAlignment(SwingConstants.LEFT);
         planBtn.addActionListener(e -> showCreateSessionDialog());
@@ -215,7 +270,7 @@ public class FitnessManagerAppGUINew extends JFrame {
         topRow.add(exercisesCard);
         topRow.add(sessionsCard);
 
-        // Recent Activity
+        // === Recent Activity ===
         JPanel recent = new JPanel(new BorderLayout());
         recent.setOpaque(false);
         recent.setBorder(new EmptyBorder(16, 0, 0, 0));
@@ -232,18 +287,17 @@ public class FitnessManagerAppGUINew extends JFrame {
         activityScroll.setBorder(new LineBorder(new Color(230, 232, 236)));
         recent.add(activityScroll, BorderLayout.CENTER);
 
-        // Counters row
+        // === Counters ===
         JPanel counters = new JPanel(new GridLayout(1, 3, 16, 16));
         counters.setOpaque(false);
         counters.setBorder(new EmptyBorder(16, 0, 0, 0));
-        totalExercisesLbl = metricCard("0", "Total Exercises");
-        totalSessionsLbl = metricCard("0", "Training Sessions");
-        programsSavedLbl = metricCard(String.valueOf(programsSavedCount), "Programs Saved");
+        totalExercisesLbl = metricNumber("0");
+        totalSessionsLbl = metricNumber("0");
+        programsSavedLbl = metricNumber(String.valueOf(programsSavedCount));
         counters.add(wrapMetric(totalExercisesLbl, "Total Exercises"));
         counters.add(wrapMetric(totalSessionsLbl, "Training Sessions"));
         counters.add(wrapMetric(programsSavedLbl, "Programs Saved"));
 
-        // Assemble home
         home.add(buildWelcomeHeader(), BorderLayout.NORTH);
         home.add(topRow, BorderLayout.CENTER);
         JPanel bottom = new JPanel(new BorderLayout());
@@ -252,7 +306,7 @@ public class FitnessManagerAppGUINew extends JFrame {
         bottom.add(counters, BorderLayout.SOUTH);
         home.add(bottom, BorderLayout.SOUTH);
 
-        // TEXT OUTPUT PAGE (for some views)
+        // Text output page (kept)
         outputArea = new JTextArea();
         outputArea.setEditable(false);
         outputArea.setFont(new Font("SansSerif", Font.PLAIN, 14));
@@ -260,8 +314,28 @@ public class FitnessManagerAppGUINew extends JFrame {
         textPage.setBorder(new EmptyBorder(16, 16, 16, 16));
         textPage.add(new JScrollPane(outputArea), BorderLayout.CENTER);
 
+        // NEW: Session detail page
+        sessionDetailPage = new JPanel(new BorderLayout());
+        sessionDetailPage.setBorder(new EmptyBorder(16, 16, 16, 16));
+        sessionDetailTitle = new JLabel("Session");
+        sessionDetailTitle.setFont(new Font("SansSerif", Font.BOLD, 18));
+
+        JButton backBtn = ghostButton("\u2190  Back to Dashboard");
+        backBtn.addActionListener(e -> goHome());
+        JPanel head = new JPanel(new BorderLayout());
+        head.add(sessionDetailTitle, BorderLayout.WEST);
+        head.add(backBtn, BorderLayout.EAST);
+        sessionDetailPage.add(head, BorderLayout.NORTH);
+
+        sessionDetailList = new JPanel();
+        sessionDetailList.setLayout(new BoxLayout(sessionDetailList, BoxLayout.Y_AXIS));
+        JScrollPane detailScroll = new JScrollPane(sessionDetailList);
+        detailScroll.setBorder(new LineBorder(new Color(230, 232, 236)));
+        sessionDetailPage.add(detailScroll, BorderLayout.CENTER);
+
         mainArea.add(home, "home");
         mainArea.add(textPage, "text");
+        mainArea.add(sessionDetailPage, "session-detail");
 
         cards.show(mainArea, "home");
         return mainArea;
@@ -289,7 +363,7 @@ public class FitnessManagerAppGUINew extends JFrame {
         return panel;
     }
 
-    // ---------- Dialogs / Actions (functionality preserved) ----------
+    // ---------- Dialogs / Actions (functionality preserved + list refresh) ----------
 
     private void showCreateExerciseDialog() {
         JTextField nameField = new JTextField();
@@ -317,7 +391,7 @@ public class FitnessManagerAppGUINew extends JFrame {
             int reps = Integer.parseInt(repsField.getText().trim());
 
             manager.createExercise(name, muscle, weight, reps);
-            refreshHomeCounts();
+            refreshAllUI();
             pushActivity("Created exercise: " + name);
             toast("Exercise '" + name + "' added.");
         } catch (NumberFormatException ex) {
@@ -344,6 +418,10 @@ public class FitnessManagerAppGUINew extends JFrame {
             return;
         }
 
+        openEditExerciseDialog(e);
+    }
+
+    private void openEditExerciseDialog(Exercise e) {
         JTextField nameField = new JTextField(e.getName());
         JTextField muscleField = new JTextField(e.getTargetMuscle());
         JTextField weightField = new JTextField(String.valueOf(e.getWeight()));
@@ -366,6 +444,7 @@ public class FitnessManagerAppGUINew extends JFrame {
             e.setWeight(Integer.parseInt(weightField.getText().trim()));
             e.setReps(Integer.parseInt(repsField.getText().trim()));
             pushActivity("Updated exercise: " + e.getName());
+            refreshAllUI();
             toast("Exercise updated.");
         } catch (NumberFormatException ex) {
             toastError("Invalid numbers for weight/reps.");
@@ -381,7 +460,7 @@ public class FitnessManagerAppGUINew extends JFrame {
             return;
         }
         manager.createSession(name);
-        refreshHomeCounts();
+        refreshAllUI();
         pushActivity("Created session: " + name);
         toast("Training session created.");
     }
@@ -403,6 +482,7 @@ public class FitnessManagerAppGUINew extends JFrame {
         if (s != null) {
             s.clearSession();
             pushActivity("Cleared session: " + selected);
+            refreshAllUI();
             toast("Session cleared.");
         }
     }
@@ -434,6 +514,7 @@ public class FitnessManagerAppGUINew extends JFrame {
             int sets = Integer.parseInt(setsStr.trim());
             manager.addExerciseToSession(session, exercise, sets);
             pushActivity("Added " + exercise + " (" + sets + " sets) to " + session);
+            refreshAllUI();
             toast("Exercise added to session.");
         } catch (NumberFormatException ex) {
             toastError("Invalid set number.");
@@ -497,15 +578,7 @@ public class FitnessManagerAppGUINew extends JFrame {
             toastError("Session not found.");
             return;
         }
-
-        StringBuilder sb = new StringBuilder("Exercises in '").append(choice).append("'\n\n");
-        for (Map.Entry<Exercise, Integer> entry : s.getExerciseSets().entrySet()) {
-            sb.append("- ").append(entry.getKey().getName())
-              .append(" — ").append(entry.getValue()).append(" sets\n");
-        }
-        if (s.getExerciseSets().isEmpty()) sb.append("(No exercises yet)");
-        outputArea.setText(sb.toString());
-        cards.show(mainArea, "text");
+        openSessionDetail(s);
     }
 
     private void viewAllExercisesAndSessions() {
@@ -527,11 +600,11 @@ public class FitnessManagerAppGUINew extends JFrame {
 
     private void saveData() {
         try {
-            jsonWriter.open();            // will also create ./data first run
+            jsonWriter.open();
             jsonWriter.write(manager);
             jsonWriter.close();
             programsSavedCount++;
-            refreshHomeCounts();
+            refreshAllUI();
             pushActivity("Saved program to disk.");
             toast("Saved to " + new File(JSON_STORE).getPath());
         } catch (FileNotFoundException e) {
@@ -555,6 +628,187 @@ public class FitnessManagerAppGUINew extends JFrame {
         }
     }
 
+    // ---------- NEW: Live list rendering ----------
+
+    private void refreshAllUI() {
+        refreshHomeCounts();
+        rebuildExerciseList();
+        rebuildSessionList();
+    }
+
+    private void rebuildExerciseList() {
+        exercisesListPanel.removeAll();
+        if (manager.getExercises().isEmpty()) {
+            exercisesListPanel.add(emptyHint("No exercises yet."));
+        } else {
+            for (Exercise e : manager.getExercises()) {
+                exercisesListPanel.add(exerciseRow(e));
+                exercisesListPanel.add(Box.createVerticalStrut(4));
+            }
+        }
+        exercisesListPanel.revalidate();
+        exercisesListPanel.repaint();
+    }
+
+    private void rebuildSessionList() {
+        sessionsListPanel.removeAll();
+        if (manager.getSessions().isEmpty()) {
+            sessionsListPanel.add(emptyHint("No training sessions yet."));
+        } else {
+            for (TrainingSession s : manager.getSessions()) {
+                sessionsListPanel.add(sessionRow(s));
+                sessionsListPanel.add(Box.createVerticalStrut(4));
+            }
+        }
+        sessionsListPanel.revalidate();
+        sessionsListPanel.repaint();
+    }
+
+    // private JPanel exerciseRow(Exercise e) {
+    //     // JPanel row = new JPanel(new BorderLayout());
+    //     // row.setBackground(Color.WHITE);
+    //     // row.setBorder(new LineBorder(new Color(230, 232, 236)));
+
+    //     // String left = e.getName() + " — " + e.getTargetMuscle()
+    //     //         + " | " + e.getWeight() + " lbs | " + e.getReps() + " reps";
+    //     // JLabel lbl = new JLabel("  " + left);
+    //     // lbl.setFont(new Font("SansSerif", Font.PLAIN, 13));
+    //     // row.add(lbl, BorderLayout.WEST);
+
+    //     // JButton edit = ghostButton("Edit");
+    //     // edit.addActionListener(a -> openEditExerciseDialog(e));
+
+    //     // JPanel right = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 6));
+    //     // right.setOpaque(false);
+    //     // right.add(edit);
+    //     // row.add(right, BorderLayout.EAST);
+
+    //     // return row;
+    // }
+    private JPanel exerciseRow(Exercise e) {
+        JPanel row = new JPanel(new BorderLayout());
+        row.setBackground(Color.WHITE);
+        row.setBorder(new LineBorder(new Color(230, 232, 236)));
+
+        // fixed height and full width in BoxLayout
+        row.setPreferredSize(new Dimension(Integer.MAX_VALUE, COMPACT_ROW_HEIGHT));
+        row.setMaximumSize(new Dimension(Integer.MAX_VALUE, COMPACT_ROW_HEIGHT));
+        row.setMinimumSize(new Dimension(0, COMPACT_ROW_HEIGHT));
+
+        String left = e.getName() + " — " + e.getTargetMuscle()
+                + " | " + e.getWeight() + " lbs | " + e.getReps() + " reps";
+        JLabel lbl = new JLabel("  " + left);
+        lbl.setFont(ROW_FONT);
+        lbl.setBorder(new EmptyBorder(0, COMPACT_HPAD, 0, 0));
+        row.add(lbl, BorderLayout.CENTER);
+
+        JButton edit = ghostButton("Edit");
+        edit.setFont(ROW_FONT);
+        edit.setMargin(BTN_INSETS);
+
+        JPanel right = new JPanel(new FlowLayout(FlowLayout.RIGHT, 6, 3));
+        right.setOpaque(false);
+        right.add(edit);
+        row.add(right, BorderLayout.EAST);
+
+        edit.addActionListener(a -> openEditExerciseDialog(e));
+        return row;
+    }
+
+    // private JPanel sessionRow(TrainingSession s) {
+    //     JPanel row = new JPanel(new BorderLayout());
+    //     row.setBackground(Color.WHITE);
+    //     row.setBorder(new LineBorder(new Color(230, 232, 236)));
+
+    //     JLabel lbl = new JLabel("  " + s.getName());
+    //     lbl.setFont(new Font("SansSerif", Font.PLAIN, 13));
+    //     row.add(lbl, BorderLayout.WEST);
+
+    //     JButton view = ghostButton("Edit / View");
+    //     view.addActionListener(a -> openSessionDetail(s));
+
+    //     JPanel right = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 6));
+    //     right.setOpaque(false);
+    //     right.add(view);
+    //     row.add(right, BorderLayout.EAST);
+
+    //     return row;
+    // }
+    private JPanel sessionRow(TrainingSession s) {
+        JPanel row = new JPanel(new BorderLayout());
+        row.setBackground(Color.WHITE);
+        row.setBorder(new LineBorder(new Color(230, 232, 236)));
+
+        row.setPreferredSize(new Dimension(Integer.MAX_VALUE, COMPACT_ROW_HEIGHT));
+        row.setMaximumSize(new Dimension(Integer.MAX_VALUE, COMPACT_ROW_HEIGHT));
+        row.setMinimumSize(new Dimension(0, COMPACT_ROW_HEIGHT));
+
+        JLabel lbl = new JLabel("  " + s.getName());
+        lbl.setFont(ROW_FONT);
+        lbl.setBorder(new EmptyBorder(0, COMPACT_HPAD, 0, 0));
+        row.add(lbl, BorderLayout.CENTER);
+
+        JButton view = ghostButton("Edit / View");
+        view.setFont(ROW_FONT);
+        view.setMargin(BTN_INSETS);
+
+        JPanel right = new JPanel(new FlowLayout(FlowLayout.RIGHT, 6, 3));
+        right.setOpaque(false);
+        right.add(view);
+        row.add(right, BorderLayout.EAST);
+
+        view.addActionListener(a -> openSessionDetail(s));
+        return row;
+    }
+
+
+    private void openSessionDetail(TrainingSession s) {
+        sessionDetailTitle.setText("Session — " + s.getName());
+        sessionDetailList.removeAll();
+
+        if (s.getExerciseSets().isEmpty()) {
+            sessionDetailList.add(emptyHint("No exercises in this session yet."));
+        } else {
+            for (Map.Entry<Exercise, Integer> entry : s.getExerciseSets().entrySet()) {
+                Exercise e = entry.getKey();
+                int sets = entry.getValue();
+                String text = e.getName() + " — " + e.getTargetMuscle()
+                        + " | " + e.getWeight() + " lbs | " + e.getReps()
+                        + " reps | " + sets + " sets";
+                JPanel row = new JPanel(new BorderLayout());
+                row.setBackground(Color.WHITE);
+                row.setBorder(new LineBorder(new Color(230, 232, 236)));
+                row.add(new JLabel("  " + text), BorderLayout.CENTER);
+
+                // quick edit shortcut for the exercise
+                JButton editExercise = ghostButton("Edit Exercise");
+                editExercise.addActionListener(a -> {
+                    openEditExerciseDialog(e);
+                    // after edit, reflect updates in detail + dashboard
+                    openSessionDetail(s);
+                    refreshAllUI();
+                });
+                JPanel right = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 6));
+                right.setOpaque(false);
+                right.add(editExercise);
+                row.add(right, BorderLayout.EAST);
+
+                row.setPreferredSize(new Dimension(Integer.MAX_VALUE, COMPACT_ROW_HEIGHT));
+                row.setMaximumSize(new Dimension(Integer.MAX_VALUE, COMPACT_ROW_HEIGHT));
+                row.setMinimumSize(new Dimension(0, COMPACT_ROW_HEIGHT));
+
+                editExercise.setFont(ROW_FONT);
+                editExercise.setMargin(BTN_INSETS);
+
+                sessionDetailList.add(row);
+                sessionDetailList.add(Box.createVerticalStrut(6));
+            }
+        }
+        sessionDetailList.revalidate();
+        sessionDetailList.repaint();
+        cards.show(mainArea, "session-detail");
+    }
+
     // ---------- Small helpers / styling ----------
 
     private void pushActivity(String text) {
@@ -568,14 +822,11 @@ public class FitnessManagerAppGUINew extends JFrame {
         programsSavedLbl.setText(String.valueOf(programsSavedCount));
     }
 
-    private JPanel bigCard(String title, String body) {
-        JPanel card = new JPanel(new BorderLayout());
-        card.setBackground(Color.WHITE);
-        card.setBorder(new LineBorder(new Color(230, 232, 236)));
+    private JPanel cardHeader(String title, String body) {
         JPanel inner = new JPanel();
         inner.setOpaque(false);
         inner.setLayout(new BoxLayout(inner, BoxLayout.Y_AXIS));
-        inner.setBorder(new EmptyBorder(16, 16, 16, 16));
+        inner.setBorder(new EmptyBorder(16, 16, 8, 16));
 
         JLabel t = new JLabel(title);
         t.setFont(new Font("SansSerif", Font.BOLD, 16));
@@ -587,11 +838,13 @@ public class FitnessManagerAppGUINew extends JFrame {
         inner.add(Box.createVerticalStrut(8));
         inner.add(b);
 
-        card.add(inner, BorderLayout.CENTER);
-        return card;
+        JPanel wrapper = new JPanel(new BorderLayout());
+        wrapper.setOpaque(false);
+        wrapper.add(inner, BorderLayout.CENTER);
+        return wrapper;
     }
 
-    private JLabel metricCard(String number, String label) {
+    private JLabel metricNumber(String number) {
         JLabel lbl = new JLabel(number, SwingConstants.CENTER);
         lbl.setFont(new Font("SansSerif", Font.BOLD, 26));
         lbl.setBorder(new EmptyBorder(16, 0, 4, 0));
@@ -653,16 +906,14 @@ public class FitnessManagerAppGUINew extends JFrame {
         return b;
     }
 
-    private void toast(String message) {
-        JOptionPane.showMessageDialog(this, message, "Fitness Manager", JOptionPane.INFORMATION_MESSAGE);
-    }
-
-    private void toastError(String message) {
-        JOptionPane.showMessageDialog(this, message, "Fitness Manager", JOptionPane.ERROR_MESSAGE);
+    private JComponent emptyHint(String text) {
+        JLabel l = new JLabel(text);
+        l.setForeground(new Color(120, 126, 134));
+        l.setBorder(new EmptyBorder(8, 12, 8, 12));
+        return l;
     }
 
     private ImageIcon loadScaledIcon(String resourcePath, int w, int h) {
-        // Try classpath first (recommended). If null, try file path relative to project root.
         java.net.URL url = getClass().getResource(resourcePath);
         Image img = null;
         if (url != null) {
@@ -675,15 +926,17 @@ public class FitnessManagerAppGUINew extends JFrame {
         return new ImageIcon(img.getScaledInstance(w, h, Image.SCALE_SMOOTH));
     }
 
-    /**
-     * Tiny transparent image to avoid null icons if resources aren’t found.
-     */
     private static class BufferedImageStub extends java.awt.image.BufferedImage {
         public BufferedImageStub(int w, int h) { super(w, h, java.awt.image.BufferedImage.TYPE_INT_ARGB); }
     }
 
+    private void goHome() {
+        if (cards != null && mainArea != null) {
+            cards.show(mainArea, "home");
+        }
+    }
+
     public static void main(String[] args) {
-        // Optional: light system L&F for nicer look on Windows
         try { UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); } catch (Exception ignored) {}
         new FitnessManagerAppGUINew();
     }
