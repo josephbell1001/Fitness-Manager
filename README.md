@@ -1,6 +1,6 @@
 # 🏋️‍♂️ Fitness Manager
 
-A simple desktop app I wrote in Java to create custom workout plans. I keep a library of exercises, bundle them into named training sessions (with set counts), and save/load everything to JSON. The UI is clean, fast, and simple to use.
+A simple desktop app I wrote in Java to create custom workout plans. I used Swing to create the UI in which a user can create a library of exercises and add them to a library of training sessions (along with set counts for the exercise), and save/load everything to JSON. The UI is clean, fast, and simple to use. With options to edit exercise details and training plans, keep track of the weight, reps, sets, and specific exercises that you do for your workouts!
 
 ---
 
