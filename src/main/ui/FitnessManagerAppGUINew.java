@@ -230,7 +230,9 @@ public class FitnessManagerAppGUINew extends JFrame {
         exercisesCard.setBackground(Color.WHITE);
         exercisesCard.setBorder(new LineBorder(new Color(230, 232, 236)));
 
-        JPanel exHeader = cardHeader("\uD83D\uDCAA  Exercises",
+        // JPanel exHeader = cardHeader("\uD83D\uDCAA  Exercises",
+        //         "Create and manage your exercise library. Provide a name, target muscle, weight, and reps for a given exercise.");
+        JPanel exHeader = cardHeader("Exercises",
                 "Create and manage your exercise library. Provide a name, target muscle, weight, and reps for a given exercise.");
         exercisesCard.add(exHeader, BorderLayout.NORTH);
 
@@ -255,7 +257,9 @@ public class FitnessManagerAppGUINew extends JFrame {
         sessionsCard.setBackground(Color.WHITE);
         sessionsCard.setBorder(new LineBorder(new Color(230, 232, 236)));
 
-        JPanel sesHeader = cardHeader("\uD83D\uDCC5  Training Sessions",
+        // JPanel sesHeader = cardHeader("\uD83D\uDCC5  Training Sessions",
+        //         "Build custom training sessions by combining various exercises and listing each ones number of sets.");
+        JPanel sesHeader = cardHeader("Training Sessions",
                 "Build custom training sessions by combining various exercises and listing each ones number of sets.");
         sessionsCard.add(sesHeader, BorderLayout.NORTH);
 
